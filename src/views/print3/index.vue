@@ -1,7 +1,7 @@
 <!--
  * @Author: wufengliang 44823912@qq.com
  * @Date: 2025-06-30 21:16:10
- * @LastEditTime: 2025-07-07 17:47:22
+ * @LastEditTime: 2025-07-13 17:27:59
  * @Description: 自定义打印
 -->
 <template>
@@ -160,12 +160,17 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, toRaw, computed } from 'vue';
-import { hiprint, defaultElementTypeProvider } from "vue-plugin-hiprint";
+import * as aa from 'vue-plugin-hiprint';
+import { hiprint, defaultElementTypeProvider, autoConnect } from "vue-plugin-hiprint";
 import $ from 'jquery';
 import { createModal } from '@/global/create-modal';
 import WidthTemplate from './width.vue';
 import JsonTemplate from './json.vue';
 import { webPrint, clientPrint } from './params';
+
+console.log(aa);
+
+// autoConnect();
 
 const hiprintTemplate = ref();
 const panel = ref();
@@ -197,7 +202,7 @@ const init = (template: Record<string, any> = {}) => {
     // eslint-disable-next-line no-undef
     hiprint.PrintElementTypeManager.buildByHtml($('.ep-draggable-item'));
     $('#hiprint-printTemplate').empty()
-    if (template.panels && template?.panels?.[0]) {
+    if (template?.panels && template?.panels?.[0]) {
         template.panels[0].paperNumberDisabled = true;
     }
     hiprintTemplate.value = new hiprint.PrintTemplate({
@@ -282,9 +287,9 @@ const setConfig = () => {
         title: '设置大小',
         component: WidthTemplate,
         beforeClose: v => {
-            const { width, height } = toRaw(v.options);
+            const { width, height,leftOffset,topOffset } = toRaw(v.options);
             if (width && height) {
-                hiprintTemplate.value?.setPaper(width, height)
+                hiprintTemplate.value?.setPaper(width, height,leftOffset,topOffset)
             }
         }
     })
@@ -306,7 +311,7 @@ const print = (type: 'client' | 'web') => {
     }
 
     if (type === 'client') {
-        return hiprintTemplate.value?.print2();
+        return hiprintTemplate.value?.print2(printData.value);
     }
 }
 
